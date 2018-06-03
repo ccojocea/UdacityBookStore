@@ -63,14 +63,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Insert into database.
+     * Insert data into database.
      */
     private void insertData() {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         // Generate random number between 1 and 10
         Random rand = new Random();
-        int max = 6;
+        int max = 5;
         int min = 1;
         int random = rand.nextInt((max - min) + 1) + min;
 
@@ -79,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
         int genre = BookEntry.GENRE_UNKNOWN;
         int price = 0;
         int quantity = 0;
-        String supplierName = "";
-        String supplierPhone = "";
+        String supplierName;
+        String supplierPhone;
         int printType = BookEntry.PRINT_UNKNOWN;
         String language = "English";
         int format = BookEntry.FORMAT_UNKNOWN;
@@ -237,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
                         BookEntry.COLUMN_SUPPLIER_NAME + " - " +
                         BookEntry.COLUMN_SUPPLIER_PHONE_NUMBER
                 );
+                displayTextView.append("\n");
             }
 
             while (c.moveToNext()) {
