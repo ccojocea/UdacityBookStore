@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- These are the options displayed in the genre drop-down Spinner -->
+    <string-array name="array_genre_options">
+        <item>@string/genre_unknown</item>
+        <item>@string/genre_other</item>
+        <item>@string/genre_crime_mistery</item>
+        <item>@string/genre_horror</item>
+        <item>@string/genre_fantasy</item>
+        <item>@string/genre_children</item>
+        <item>@string/genre_adult</item>
+        <item>@string/genre_literary_fiction</item>
+        <item>@string/genre_historical_fiction</item>
+        <item>@string/genre_science_fiction</item>
+        <item>@string/genre_history</item>
+    </string-array>
+
+    <!-- These are the options displayed in the format drop-down Spinner -->
+    <string-array name="array_format_options">
+        <item>@string/format_unknown</item>
+        <item>@string/format_paperback</item>
+        <item>@string/format_hardcover</item>
+        <item>@string/format_ebook</item>
+    </string-array>
+
+    <!-- These are the options displayed in the print drop-down Spinner -->
+    <string-array name="array_print_options">
+        <item>@string/print_unknown</item>
+        <item>@string/print_black_and_white</item>
+        <item>@string/print_color</item>
+    </string-array>
+</resources>

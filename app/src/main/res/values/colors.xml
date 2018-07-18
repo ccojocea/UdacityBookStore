@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Default colors -->
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#8f9199</color>
+    <color name="colorPrimaryDark">#2d2d31</color>
+    <color name="colorAccent">#ff7340</color>
 
     <!-- Launcher background color -->
     <color name="ic_launcher_background">#68001F</color>
+
+    <!-- Primary color for the editor -->
+    <color name="editorColorPrimary">#2D3640</color>
+
+    <!-- Primary dark color for the editor -->
+    <color name="editorColorPrimaryDark">#394450</color>
 </resources>

@@ -45,7 +45,7 @@ public class BookCursorAdapter extends CursorAdapter{
         // Populate fields with extracted properties
         tvBookName.setText(name);
         tvBookAuthor.setText(author);
-        tvBookPrice.setText(price);
-        tvBookQuantity.setText(quantity);
+        tvBookPrice.setText(String.valueOf(price));
+        tvBookQuantity.setText(String.valueOf(quantity));
     }
 }

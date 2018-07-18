@@ -11,6 +11,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.example.ccojo.udacitybookstore.R;
+
 public class BookProvider extends ContentProvider {
 
     /** Constant for LOG messages */
@@ -79,7 +81,7 @@ public class BookProvider extends ContentProvider {
                         sortOrder);
                 break;
             default:
-                throw new IllegalArgumentException("Cannot query unknown URI " + uri);
+                throw new IllegalArgumentException(getContext().getString(R.string.query_unknown_URI) + uri);
         }
 
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
@@ -132,7 +134,7 @@ public class BookProvider extends ContentProvider {
                 rowsUpdated = updateBook (uri, values, selection, selectionArgs);
                 break;
             case BOOK_ID:
-                selection = "id=?";
+                selection = BookContract.BookEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
                 rowsUpdated = updateBook (uri, values, selection, selectionArgs);

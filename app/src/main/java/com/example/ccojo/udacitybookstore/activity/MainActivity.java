@@ -1,263 +1,142 @@
 package com.example.ccojo.udacitybookstore.activity;
 
-import android.content.ContentValues;
+import android.app.LoaderManager;
+import android.content.ContentUris;
+import android.content.CursorLoader;
+import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
+import com.example.ccojo.udacitybookstore.BookCursorAdapter;
 import com.example.ccojo.udacitybookstore.R;
-import com.example.ccojo.udacitybookstore.data.BookDbHelper;
 import com.example.ccojo.udacitybookstore.data.BookContract.BookEntry;
 
-import java.util.Random;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // Tag for log messages
     private static final String LOG_TAG = MainActivity.class.getName();
 
     // Views
-    private TextView displayTextView;
-    private Button insertButton;
-    private Button deleteButton;
-    private ScrollView scrollView;
+    private ListView bookListView;
+    private View emptyView;
 
-    // Database SQLiteOpenHelper
-    private BookDbHelper mDbHelper;
+    // Adapter used to display the list's data
+    BookCursorAdapter mCursorAdapter;
+
+    // Constant for the cursor loader
+    private static final int BOOK_LOADER = 0;
+
+    // Book rows to be retrieved
+    static final String[] PROJECTION = {
+        BookEntry._ID,
+        BookEntry.COLUMN_PRODUCT_NAME,
+        BookEntry.COLUMN_AUTHOR,
+        BookEntry.COLUMN_PRICE,
+        BookEntry.COLUMN_QUANTITY
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Create the database helper object
-        mDbHelper = new BookDbHelper(this);
+        // Initialise views
+        bookListView = findViewById(R.id.list_view);
+        emptyView = findViewById(R.id.empty_view);
 
-        displayTextView = findViewById(R.id.displayTextView);
-        insertButton = findViewById(R.id.button);
-        deleteButton = findViewById(R.id.button2);
-        scrollView = findViewById(R.id.scrollView);
+        // Set the empty view on the listview so it only shows when the list has 0 items
+        bookListView.setEmptyView(emptyView);
 
-        // set the button to add some data in the database
-        insertButton.setOnClickListener(new View.OnClickListener() {
+        // Setup the item click listener so each item from the listview opens in the Editor Activity
+        bookListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
-                insertData();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Content URI which represents the specific book that was clicked on
+                Uri uri = ContentUris.withAppendedId(BookEntry.CONTENT_URI, id);
+
+                // Create the new intent to go to the Editor Activity
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+
+                // Set the Uri on the data field of the intent
+                intent.setData(uri);
+
+                // Launch the editor activity
+                startActivity(intent);
             }
         });
 
-        // set the button to delete data from the database
-        deleteButton.setOnClickListener(new View.OnClickListener() {
+        // Setup the floating action button to open the editor activity in add mode
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                deleteData();
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                startActivity(intent);
             }
         });
 
-        displayDatabaseInfo(queryData());
+        // Create an empty adapter used to display the loaded data
+        // This will be updated in onLoadFinished()
+        mCursorAdapter = new BookCursorAdapter(this, null);
+
+        // Prepare the loader. Reconnect with an existing one or start a new one
+        getLoaderManager().initLoader(BOOK_LOADER, null, this);
+
+        // Attach the cursor adapter to the list view
+        bookListView.setAdapter(mCursorAdapter);
     }
 
-    /**
-     * Insert data into database.
-     */
-    private void insertData() {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu options from the res/menu/menu_main.xml file
+        // This adds the gears icon to the app bar
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
-        // Generate random number between 1 and 10
-        Random rand = new Random();
-        int max = 5;
-        int min = 1;
-        int random = rand.nextInt((max - min) + 1) + min;
-
-        String productName;
-        String authorName = "Unknown";
-        int genre = BookEntry.GENRE_UNKNOWN;
-        int price = 0;
-        int quantity = 0;
-        String supplierName;
-        String supplierPhone;
-        int printType = BookEntry.PRINT_UNKNOWN;
-        String language = "English";
-        int format = BookEntry.FORMAT_UNKNOWN;
-
-        switch (random) {
-            case 1:
-                productName = "A Tale of Two Cities";
-                authorName = "Charles Dickens";
-                genre = BookEntry.GENRE_HISTORICAL_FICTION;
-                price = 999;
-                quantity = 15;
-                supplierName = "Amazon";
-                supplierPhone = "123123891273";
-                printType = BookEntry.PRINT_COLOR;
-                format = BookEntry.FORMAT_HARDCOVER;
-                break;
-            case 2:
-                productName = "Harry Potter";
-                authorName = "J.K. Rowlins";
-                genre = BookEntry.GENRE_CHILDREN;
-                price = 1999;
-                quantity = 20;
-                supplierName = "Amazon";
-                supplierPhone = "123123891273";
-                printType = BookEntry.PRINT_COLOR;
-                format = BookEntry.FORMAT_EBOOK;
-                break;
-            case 3:
-                productName = "The Lord of the Rings";
-                authorName = "J.R.R. Tolkien";
-                genre = BookEntry.GENRE_FANTASY;
-                price = 1950;
-                quantity = 30;
-                supplierName = "Powell’s Books";
-                supplierPhone = "123123891273";
-                printType = BookEntry.PRINT_COLOR;
-                format = BookEntry.FORMAT_PAPERBACK;
-                break;
-            case 4:
-                productName = "And Then There Were None";
-                authorName = "Agatha Christie";
-                genre = BookEntry.GENRE_CRIME_MISTERY;
-                price = 1299;
-                quantity = 40;
-                supplierName = "Books-A-Million";
-                supplierPhone = "12312391273";
-                printType = BookEntry.PRINT_BLACK_AND_WHITE;
-                format = BookEntry.FORMAT_HARDCOVER;
-                break;
-            case 5:
-                productName = "The Catcher in the Rye";
-                authorName = "J. D. Salinger";
-                genre = BookEntry.GENRE_OTHER;
-                price = 2550;
-                quantity = 50;
-                supplierName = "Alibris";
-                supplierPhone = "123123891273";
-                printType = BookEntry.PRINT_COLOR;
-                format = BookEntry.FORMAT_PAPERBACK;
-                break;
-            default:
-                productName = "Random Book";
-                supplierName = "Unknown";
-                supplierPhone = "Unknown";
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_setup) {
+            //TODO: open preferences screen
         }
 
-        ContentValues values = new ContentValues();
-        values.put(BookEntry.COLUMN_PRODUCT_NAME, productName);
-        values.put(BookEntry.COLUMN_AUTHOR, authorName);
-        values.put(BookEntry.COLUMN_GENRE, genre);
-        values.put(BookEntry.COLUMN_PRICE, price);
-        values.put(BookEntry.COLUMN_QUANTITY, quantity);
-        values.put(BookEntry.COLUMN_SUPPLIER_NAME, supplierName);
-        values.put(BookEntry.COLUMN_SUPPLIER_PHONE_NUMBER, supplierPhone);
-        values.put(BookEntry.COLUMN_PRINT_TYPE, printType);
-        values.put(BookEntry.COLUMN_LANGUAGE, language);
-        values.put(BookEntry.COLUMN_FORMAT, format);
-
-        db.insert(BookEntry.TABLE_NAME, null, values);
-
-        displayDatabaseInfo(queryData());
+        return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Query the database.
-     */
-    private Cursor queryData() {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        // array of columns to be returned
-        String[] projection = {
-                BookEntry._ID,
-                BookEntry.COLUMN_PRODUCT_NAME,
-                BookEntry.COLUMN_AUTHOR,
-                BookEntry.COLUMN_GENRE,
-                BookEntry.COLUMN_PRICE,
-                BookEntry.COLUMN_QUANTITY,
-                BookEntry.COLUMN_SUPPLIER_NAME,
-                BookEntry.COLUMN_SUPPLIER_PHONE_NUMBER,
-                BookEntry.COLUMN_PRINT_TYPE,
-                BookEntry.COLUMN_LANGUAGE,
-                BookEntry.COLUMN_FORMAT
-        };
-
-        return db.query(BookEntry.TABLE_NAME, projection, null, null, null, null, null, null);
-    }
-
-    /**
-     * Delete all data from the database
-     */
+    // TODO:
+    // Used in the preferences screen
     private void deleteData() {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        long result = db.delete(BookEntry.TABLE_NAME, null, null);
-        Log.d(LOG_TAG, "deleteData: " + result);
-
-        displayDatabaseInfo(queryData());
+        int rowsDeleted = getContentResolver().delete(BookEntry.CONTENT_URI, null, null);
     }
 
-    /**
-     * Display database information in the available TextView:
-     * Row count
-     * Each record
-     * @param c
-     */
-    public void displayDatabaseInfo(Cursor c) {
-        if (c == null) {
-            return;
-        }
+    // Called when a new Loader needs to be created
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // Create and return a cursor loader that will take care of creating a cursor for the data being displayed.
+        return new CursorLoader(this, BookEntry.CONTENT_URI, PROJECTION, null, null, null);
+    }
 
-        try {
-            displayTextView.setText("Number of books in the database table: " + c.getCount());
+    // Called when a previously created loader has finished loading
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        // Swap the new cursor in (Old cursor is closed by the framework)
+        mCursorAdapter.swapCursor(data);
+    }
 
-            int idColumnIndex = c.getColumnIndex(BookEntry._ID);
-            int nameColumnIndex = c.getColumnIndex(BookEntry.COLUMN_PRODUCT_NAME);
-            int authorColumnIndex = c.getColumnIndex(BookEntry.COLUMN_AUTHOR);
-            int genreColumnIndex = c.getColumnIndex(BookEntry.COLUMN_GENRE);
-            int priceColumnIndex = c.getColumnIndex(BookEntry.COLUMN_PRICE);
-            int quantityColumnIndex = c.getColumnIndex(BookEntry.COLUMN_QUANTITY);
-            int supplierNameColumnIndex = c.getColumnIndex(BookEntry.COLUMN_SUPPLIER_NAME);
-            int supplierPhoneColumnIndex = c.getColumnIndex(BookEntry.COLUMN_SUPPLIER_PHONE_NUMBER);
-            int printTypeColumnIndex = c.getColumnIndex(BookEntry.COLUMN_PRINT_TYPE);
-            int languageColumnIndex = c.getColumnIndex(BookEntry.COLUMN_LANGUAGE);
-            int formatColumnIndex = c.getColumnIndex(BookEntry.COLUMN_FORMAT);
-
-            if (c.getCount() > 0) {
-                displayTextView.append("\n\n");
-                displayTextView.append(
-                        BookEntry._ID + " - " +
-                        BookEntry.COLUMN_PRODUCT_NAME + " - " +
-                        BookEntry.COLUMN_AUTHOR + " - " +
-                        BookEntry.COLUMN_GENRE + " - " +
-                        BookEntry.COLUMN_PRICE + " - " +
-                        BookEntry.COLUMN_QUANTITY + " - " +
-                        BookEntry.COLUMN_SUPPLIER_NAME + " - " +
-                        BookEntry.COLUMN_SUPPLIER_PHONE_NUMBER
-                );
-                displayTextView.append("\n");
-            }
-
-            while (c.moveToNext()) {
-                int id = c.getInt(idColumnIndex);
-                String name = c.getString(nameColumnIndex);
-                String author = c.getString(authorColumnIndex);
-                int genre = c.getInt(genreColumnIndex);
-                long price = c.getInt(priceColumnIndex) / 100;
-                int quantity = c.getInt(quantityColumnIndex);
-                String supplierName = c.getString(supplierNameColumnIndex);
-                String supplierPhone = c.getString(supplierPhoneColumnIndex);
-
-                displayTextView.append("\n" + id + " - " + name + " - " + author + " - " + genre + " - " + price + " - " + quantity + " - " + supplierName + " - " + supplierPhone);
-            }
-        } finally {
-            // Close the cursor when done reading from it to release its resources
-            c.close();
-        }
-
-        scrollView.fullScroll(View.FOCUS_DOWN);
+    // Called when a previously created loader is reset, making the data unavailable
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        // This is called when the last cursor provided to onLoadFinished() is about to be closed
+        mCursorAdapter.swapCursor(null);
     }
 }
