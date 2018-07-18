@@ -1,4 +1,4 @@
-package com.example.ccojo.udacitybookstore;
+package com.example.ccojo.udacitybookstore.activity;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -11,15 +11,16 @@ import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.example.ccojo.udacitybookstore.R;
 import com.example.ccojo.udacitybookstore.data.BookDbHelper;
-import com.example.ccojo.udacitybookstore.data.BookStoreContract.BookEntry;
+import com.example.ccojo.udacitybookstore.data.BookContract.BookEntry;
 
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     // Tag for log messages
-    private static final String TAG = MainActivity.class.getName();
+    private static final String LOG_TAG = MainActivity.class.getName();
 
     // Views
     private TextView displayTextView;
@@ -194,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
     private void deleteData() {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         long result = db.delete(BookEntry.TABLE_NAME, null, null);
-        Log.d(TAG, "deleteData: " + result);
+        Log.d(LOG_TAG, "deleteData: " + result);
 
         displayDatabaseInfo(queryData());
     }

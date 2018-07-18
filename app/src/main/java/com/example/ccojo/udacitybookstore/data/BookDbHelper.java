@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.example.ccojo.udacitybookstore.data.BookStoreContract.BookEntry;
+import com.example.ccojo.udacitybookstore.data.BookContract.BookEntry;
 
 /**
  * Created by ccojo on 6/3/2018.
@@ -13,11 +13,8 @@ import com.example.ccojo.udacitybookstore.data.BookStoreContract.BookEntry;
 
 public class BookDbHelper extends SQLiteOpenHelper {
 
-    // Tag for log messages
-    private static final String TAG = BookDbHelper.class.getName();
-
     // Name of database
-    private static final String DATABASE_NAME = "bookstore";
+    private static final String DATABASE_NAME = "bookstore.db";
 
     // Version of database, increment if schema is changed
     private static final int DATABASE_VERSION = 1;
@@ -57,7 +54,6 @@ public class BookDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.d(TAG, "onCreate: Create Table: " + SQL_CREATE_BOOKS_TABLE);
         db.execSQL(SQL_CREATE_BOOKS_TABLE);
     }
 
