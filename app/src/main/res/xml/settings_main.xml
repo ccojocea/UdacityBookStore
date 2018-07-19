@@ -2,4 +2,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="Settings">
 
+    <ListPreference
+        android:defaultValue="@string/settings_default_theme_default"
+        android:entries="@array/settings_default_theme_labels"
+        android:entryValues="@array/settings_default_theme_values"
+        android:key="@string/settings_default_theme_key"
+        android:title="@string/settings_default_theme_label" />
+
 </PreferenceScreen>

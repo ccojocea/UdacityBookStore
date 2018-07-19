@@ -46,7 +46,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     // OnTouchListener - if the user touches a view, implying that they modified the view, change the
     // boolean to true
     private boolean mBookHasChanged = false;
-    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+    private final View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             mBookHasChanged = true;
@@ -57,7 +57,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     };
 
     // OnTouchListener for spinners, to close the Text Input
-    private View.OnTouchListener mTouchListenerSpinners = new View.OnTouchListener() {
+    private final View.OnTouchListener mTouchListenerSpinners = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             mBookHasChanged = true;
@@ -70,7 +70,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     };
 
     // Book rows to be retrieved
-    static final String[] PROJECTION = {
+    private static final String[] PROJECTION = {
             BookEntry._ID,
             BookEntry.COLUMN_PRODUCT_NAME,
             BookEntry.COLUMN_AUTHOR,
@@ -517,7 +517,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     // Helper method to hide the keyboard
-    public static void hideKeyboard(Activity activity) {
+    private static void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         // Find the currently focused view, so we can grab the correct window token from it
         View view = activity.getCurrentFocus();

@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.ccojo.udacitybookstore.R;
 import com.example.ccojo.udacitybookstore.data.BookContract.BookEntry;
+import com.example.ccojo.udacitybookstore.ui.MainActivity;
 
 public class BookCursorAdapter extends CursorAdapter{
 
@@ -60,7 +61,6 @@ public class BookCursorAdapter extends CursorAdapter{
             public void onClick(View v) {
                 // Create uri for current book
                 Uri mBookUri = ContentUris.withAppendedId(BookEntry.CONTENT_URI, id);
-                Log.d(TAG, "onClick: 1 " + mBookUri);
 
                 // Don't try to update if the quantity would be reduced under 0
                 if (quantity == 0) {
@@ -83,6 +83,13 @@ public class BookCursorAdapter extends CursorAdapter{
                 }
             }
         });
+
+        // Set dark or light "theme"
+        if (MainActivity.THEME.equals(context.getString(R.string.settings_default_theme_value_dark))) {
+            tvBookName.setTextColor(context.getResources().getColor(R.color.colorWhite));
+        } else {
+            tvBookName.setTextColor(context.getResources().getColor(R.color.list_item_name_color));
+        }
 
         // Populate fields with extracted properties
         tvBookName.setText(name);

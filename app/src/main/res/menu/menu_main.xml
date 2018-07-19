@@ -7,7 +7,7 @@
 
     <item
         android:id="@+id/action_setup"
-        android:title="Setup"
+        android:title="@string/main_xml_setup"
         android:icon="@drawable/setup"
         app:showAsAction="ifRoom" />
 </menu>

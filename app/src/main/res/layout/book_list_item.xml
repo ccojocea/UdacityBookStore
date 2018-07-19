@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
             android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="#2B3D4D"
+            android:textColor="@color/list_item_name_color"
             tools:text="Harry Potter" />
 
         <View

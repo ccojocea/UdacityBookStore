@@ -2,12 +2,13 @@ package com.example.ccojo.udacitybookstore.ui;
 
 import android.app.LoaderManager;
 import android.content.ContentUris;
-import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,29 +17,35 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.example.ccojo.udacitybookstore.adapters.BookCursorAdapter;
 import com.example.ccojo.udacitybookstore.R;
 import com.example.ccojo.udacitybookstore.data.BookContract.BookEntry;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // Tag for log messages
     private static final String LOG_TAG = MainActivity.class.getName();
 
+    // Theme
+    public static String THEME;
+
     // Views
     private ListView bookListView;
     private View emptyView;
+    private View baseView;
+    private TextView emptyTitleTV;
 
     // Adapter used to display the list's data
-    BookCursorAdapter mCursorAdapter;
+    private BookCursorAdapter mCursorAdapter;
 
     // Constant for the cursor loader
     private static final int BOOK_LOADER = 0;
 
     // Book rows to be retrieved
-    static final String[] PROJECTION = {
+    private static final String[] PROJECTION = {
         BookEntry._ID,
         BookEntry.COLUMN_PRODUCT_NAME,
         BookEntry.COLUMN_AUTHOR,
@@ -51,9 +58,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Get preferences
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        THEME = sharedPreferences.getString(getString(R.string.settings_default_theme_key), getString(R.string.settings_default_theme_value_light));
+
         // Initialise views
         bookListView = findViewById(R.id.list_view);
         emptyView = findViewById(R.id.empty_view);
+        baseView = findViewById(R.id.base_main);
+        emptyTitleTV = findViewById(R.id.empty_title_text);
+
+        // Set dark or light "theme"
+        if (THEME.equals(getString(R.string.settings_default_theme_value_dark))) {
+            bookListView.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            baseView.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            emptyTitleTV.setTextColor(getResources().getColor(R.color.colorWhite));
+        } else {
+            bookListView.setBackgroundColor(getResources().getColor(R.color.colorWhite));
+            baseView.setBackgroundColor(getResources().getColor(R.color.colorWhite));
+            emptyTitleTV.setTextColor(getResources().getColor(R.color.list_item_name_color));
+        }
 
         // Set the empty view on the listview so it only shows when the list has 0 items
         bookListView.setEmptyView(emptyView);

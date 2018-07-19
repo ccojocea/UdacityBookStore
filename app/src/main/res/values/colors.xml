@@ -4,6 +4,8 @@
     <color name="colorPrimary">#3a3a3b</color>
     <color name="colorPrimaryDark">#2d2d31</color>
     <color name="colorAccent">#ff7340</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="list_item_name_color">#2B3D4D</color>
 
     <!-- Launcher background color -->
     <color name="ic_launcher_background">#68001F</color>

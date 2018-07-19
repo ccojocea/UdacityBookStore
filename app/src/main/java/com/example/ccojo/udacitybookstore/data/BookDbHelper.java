@@ -3,7 +3,6 @@ package com.example.ccojo.udacitybookstore.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.example.ccojo.udacitybookstore.data.BookContract.BookEntry;
 
@@ -11,7 +10,7 @@ import com.example.ccojo.udacitybookstore.data.BookContract.BookEntry;
  * Created by ccojo on 6/3/2018.
  */
 
-public class BookDbHelper extends SQLiteOpenHelper {
+class BookDbHelper extends SQLiteOpenHelper {
 
     // Name of database
     private static final String DATABASE_NAME = "bookstore.db";

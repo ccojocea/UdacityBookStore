@@ -1,9 +1,9 @@
 package com.example.ccojo.udacitybookstore.ui;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -24,7 +24,7 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
 
     // Views
-    Button deleteButton;
+    private Button deleteButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,21 +85,55 @@ public class SettingsActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    /*
-
-    public static class BooksPreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
+    public static class BooksPreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings_main);
+
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
+            // show summary under preference label
+            Preference itemsPerPage = findPreference(getString(R.string.settings_default_theme_key));
+            bindPreferenceSummaryToValue(itemsPerPage);
         }
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
-            return false;
+            String stringValue = newValue.toString();
+
+            if (preference.getKey().equals(getString(R.string.settings_default_theme_key))) {
+                if (stringValue.equals(getString(R.string.settings_default_theme_value_dark))) {
+                    Toast.makeText(getActivity().getApplicationContext(), R.string.dark_theme_selected, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity().getApplicationContext(), R.string.light_theme_selected, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            if (preference instanceof ListPreference) {
+                ListPreference listPreference = (ListPreference) preference;
+                int prefIndex = listPreference.findIndexOfValue(stringValue);
+                if (prefIndex >= 0) {
+                    CharSequence[] labels = listPreference.getEntries();
+                    preference.setSummary(labels[prefIndex]);
+                }
+            }
+
+            return true;
+        }
+
+        private void bindPreferenceSummaryToValue(Preference preference) {
+            preference.setOnPreferenceChangeListener(this);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
+            String preferenceString = preferences.getString(preference.getKey(), "");
+            onPreferenceChange(preference, preferenceString);
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
         }
     }
-
-    */
 }

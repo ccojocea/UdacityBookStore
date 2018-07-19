@@ -5,9 +5,8 @@
     <string name="unknown_author">Unknown author</string>
     <string name="action_delete">Delete</string>
     <string name="action_save">Save</string>
-    <string name="empty_view_title_text">It\'s quite lonely here...</string>
+    <string name="empty_view_title_text">It\'s quite lonely here…</string>
     <string name="empty_view_subtitle_text">Get started by adding a book</string>
-
     <string name="category_overview">Overview</string>
     <string name="hint_book_name">Book Name</string>
     <string name="hint_author_name">Author Name</string>
@@ -18,7 +17,7 @@
     <string name="hint_book_price">Price</string>
     <string name="genre_unknown">Unknown</string>
     <string name="genre_other">Other</string>
-    <string name="genre_crime_mistery">Crime / Mistery</string>
+    <string name="genre_crime_mistery">Crime / Mystery</string>
     <string name="genre_horror">Horror</string>
     <string name="genre_fantasy">Fantasy</string>
     <string name="genre_children">Children</string>
@@ -63,4 +62,17 @@
     <string name="cursor_adapter_negative_quantity_warning">Cannot sell that which you do not have!</string>
     <string name="quantity_label">Quantity:</string>
     <string name="price_label">Price: $</string>
+
+    <string name="settings_default_theme_default">@string/settings_default_theme_value_light</string>
+    <string name="settings_default_theme_value_dark">dark</string>
+    <string name="settings_default_theme_value_light">light</string>
+    <string name="settings_default_theme_label_dark">Dark</string>
+    <string name="settings_default_theme_label_light">Light</string>
+    <string name="settings_default_theme_label">Default Theme (Main Screen)</string>
+    <string name="settings_default_theme_key">default_theme</string>
+    <string name="dark_theme_selected">Dark theme selected!</string>
+    <string name="light_theme_selected">Light theme selected!</string>
+    <string name="settings_erase_text">Using the following button will erase the entire contents of the books database. This action cannot be undone!</string>
+    <string name="settings_erase_button">Erase book database</string>
+    <string name="main_xml_setup">Setup</string>
 </resources>
