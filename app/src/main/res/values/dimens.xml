@@ -9,4 +9,6 @@
 
     <!-- Common padding value used throughout the app -->
     <dimen name="activity_padding">16dp</dimen>
+
+    <dimen name="plus_size">20sp</dimen>
 </resources>

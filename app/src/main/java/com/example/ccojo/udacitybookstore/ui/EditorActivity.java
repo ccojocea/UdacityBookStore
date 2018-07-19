@@ -1,5 +1,6 @@
 package com.example.ccojo.udacitybookstore.ui;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,13 +8,19 @@ import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -21,6 +28,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -29,10 +37,13 @@ import com.example.ccojo.udacitybookstore.R;
 
 import static com.example.ccojo.udacitybookstore.data.BookContract.*;
 
-public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // Tag for log messages
     private static final String TAG = EditorActivity.class.getName();
+
+    // Constant for phone call permission
+    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 1;
 
     // Constant for the cursor loader
     private static final int BOOK_LOADER = 0;
@@ -95,6 +106,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private Spinner mPrintTypeSpinner;
     private Spinner mFormatSpinner;
     private Spinner mGenreSpinner;
+    private Button mPlus;
+    private Button mMinus;
+    private Button mOrderButton;
 
     // Genre, Print and Format
     private int mGenre = 0;
@@ -118,6 +132,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mPrintTypeSpinner = findViewById(R.id.spinner_print);
         mFormatSpinner = findViewById(R.id.spinner_format);
         mGenreSpinner = findViewById(R.id.spinner_genre);
+        mPlus = findViewById(R.id.plus_button);
+        mMinus = findViewById(R.id.minus_button);
+        mOrderButton = findViewById(R.id.order_book_button);
 
         // Set the onTouchListener on all views
         mNameEditText.setOnTouchListener(mTouchListener);
@@ -130,6 +147,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mPrintTypeSpinner.setOnTouchListener(mTouchListenerSpinners);
         mFormatSpinner.setOnTouchListener(mTouchListenerSpinners);
         mGenreSpinner.setOnTouchListener(mTouchListenerSpinners);
+        mPlus.setOnTouchListener(mTouchListener);
+        mMinus.setOnTouchListener(mTouchListener);
 
         // Setup the 3 dropdown spinners that allow the user to select genre, print and format for the book
         setupSpinners();
@@ -148,6 +167,35 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
             setTitle(R.string.editor_activity_title_add_book);
         }
+
+        mPlus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                increaseQuantity();
+            }
+        });
+
+        mMinus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decreaseQuantity();
+            }
+        });
+
+        mOrderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mSupplierPhoneEditText.getText() != null && !mSupplierPhoneEditText.getText().equals("")) {
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mSupplierPhoneEditText.getText().toString()));
+
+                    if (checkForPhonePermission()) {
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(EditorActivity.this, R.string.call_permission_wait, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
     }
 
     // Setup the 3 dropdown spinners that allow the user to select genre, print and format for the book
@@ -527,5 +575,50 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
 
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    private void decreaseQuantity() {
+        if (mQuantityEditText.getText() != null && !mQuantityEditText.getText().toString().equals("")) {
+            int currentQuantity = Integer.valueOf(mQuantityEditText.getText().toString());
+            if (currentQuantity > 0) {
+                currentQuantity--;
+            } else {
+                Toast.makeText(this, "Can't decrease quantity under 0", Toast.LENGTH_SHORT).show();
+            }
+            mQuantityEditText.setText(String.valueOf(currentQuantity));
+        } else {
+            mQuantityEditText.setText("0");
+        }
+    }
+
+    private void increaseQuantity() {
+        if (mQuantityEditText.getText() != null && !mQuantityEditText.getText().toString().equals("")) {
+            int currentQuantity = Integer.valueOf(mQuantityEditText.getText().toString());
+            currentQuantity++;
+            mQuantityEditText.setText(String.valueOf(currentQuantity));
+        } else {
+            mQuantityEditText.setText("1");
+        }
+    }
+
+    // check for call permissions
+    private boolean checkForPhonePermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CALL_PHONE}, MY_PERMISSIONS_REQUEST_CALL_PHONE);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    // if phone permissions are granted after a button press, place the call after the permission check
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+            Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mSupplierPhoneEditText.getText().toString()));
+            startActivity(intent);
+        }
     }
 }
