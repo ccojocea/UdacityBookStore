@@ -55,4 +55,12 @@
     <string name="unsaved_changes_dialog_message">Discard your changes and quit editing?</string>
     <string name="dialog_discard">Discard</string>
     <string name="dialog_keep_editing">Keep Editing</string>
+    <string name="main_activity_data_deleted_success">Data deleted successfully</string>
+    <string name="settings_activity_delete_everything">Are you sure you want to delete everything?</string>
+    <string name="settings_activity_delete_yes">Yes, delete everything</string>
+    <string name="cursor_adapter_book_sold">Book sold!</string>
+    <string name="cursor_adapter_error_selling_book">Error selling book!</string>
+    <string name="cursor_adapter_negative_quantity_warning">Cannot sell that which you do not have!</string>
+    <string name="quantity_label">Quantity:</string>
+    <string name="price_label">Price: $</string>
 </resources>

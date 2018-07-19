@@ -1,6 +1,7 @@
-package com.example.ccojo.udacitybookstore.activity;
+package com.example.ccojo.udacitybookstore.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -17,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -24,20 +26,22 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.ccojo.udacitybookstore.R;
-import com.example.ccojo.udacitybookstore.data.BookContract;
 
 import static com.example.ccojo.udacitybookstore.data.BookContract.*;
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     // Tag for log messages
-    private static final String LOG_TAG = EditorActivity.class.getName();
+    private static final String TAG = EditorActivity.class.getName();
 
     // Constant for the cursor loader
     private static final int BOOK_LOADER = 0;
 
     // Uri
     private Uri mBookUri;
+
+    // Boolean used after user tries to save an item
+    private boolean hasPressedSave = false;
 
     // OnTouchListener - if the user touches a view, implying that they modified the view, change the
     // boolean to true
@@ -48,6 +52,19 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             mBookHasChanged = true;
             // Return false (Android will pass the event down to other views, which could be under this view)
             // Return true = The press is taken care of, tell Android to forget it.
+            return false;
+        }
+    };
+
+    // OnTouchListener for spinners, to close the Text Input
+    private View.OnTouchListener mTouchListenerSpinners = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            mBookHasChanged = true;
+
+            // Hide the keyboard if a spinner is touched
+            hideKeyboard(EditorActivity.this);
+
             return false;
         }
     };
@@ -110,9 +127,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mSupplierNameEditText.setOnTouchListener(mTouchListener);
         mSupplierPhoneEditText.setOnTouchListener(mTouchListener);
         mLanguageEditText.setOnTouchListener(mTouchListener);
-        mPrintTypeSpinner.setOnTouchListener(mTouchListener);
-        mFormatSpinner.setOnTouchListener(mTouchListener);
-        mGenreSpinner.setOnTouchListener(mTouchListener);
+        mPrintTypeSpinner.setOnTouchListener(mTouchListenerSpinners);
+        mFormatSpinner.setOnTouchListener(mTouchListenerSpinners);
+        mGenreSpinner.setOnTouchListener(mTouchListenerSpinners);
 
         // Setup the 3 dropdown spinners that allow the user to select genre, print and format for the book
         setupSpinners();
@@ -249,8 +266,16 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             case R.id.action_save:
                 //Save book to the database
                 try {
+                    // disable the save button so the user doesn't press it multiple times
+                    hasPressedSave = true;
+                    invalidateOptionsMenu();
+
+                    // try to save the book
                     saveBook();
                 } catch (IllegalArgumentException e) {
+                    // If an error is caught, make sure the button is enabled again
+                    hasPressedSave = false;
+                    invalidateOptionsMenu();
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     return false;
                 }
@@ -272,17 +297,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     return true;
                 }
 
-                // If there are unsaved changes, setup a dialog to warn the user
-                DialogInterface.OnClickListener discardButtonClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // User clicked the "Discard" button, navigate to parent activity
-                        NavUtils.navigateUpFromSameTask(EditorActivity.this);
-                    }
-                };
-
                 // Show a dialog that notifies the user they have unsaved changes
-                showUnsavedChangesDialog(discardButtonClickListener);
+                showUnsavedChangesDialog();
+
                 return true;
         }
 
@@ -298,6 +315,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         if (mBookUri == null) {
             MenuItem menuItem = menu.findItem(R.id.action_delete);
             menuItem.setVisible(false);
+        }
+
+        // If user pressed save, disable the save button
+        if (hasPressedSave) {
+            MenuItem menuItem = menu.findItem(R.id.action_save);
+            menuItem.setEnabled(false);
         }
 
         return true;
@@ -358,11 +381,30 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mGenreSpinner.setSelection(BookEntry.GENRE_UNKNOWN);
     }
 
-    private void showUnsavedChangesDialog (DialogInterface.OnClickListener discardButtonClickListener) {
+    @Override
+    public void onBackPressed() {
+        // If the book wasn't changed, continue with handling back button press
+        if (!mBookHasChanged) {
+            super.onBackPressed();
+            NavUtils.navigateUpFromSameTask(this);
+            return;
+        }
+
+        // Show dialog that there are unsaved changes
+        showUnsavedChangesDialog();
+    }
+
+    private void showUnsavedChangesDialog () {
         // Create an AlertDialog.Builder and set the message and click listeners for positive/negative buttons
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.unsaved_changes_dialog_message);
-        builder.setPositiveButton(R.string.dialog_discard, discardButtonClickListener);
+        builder.setPositiveButton(R.string.dialog_discard, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // User clicked "Discard", close the current activity
+                finish();
+            }
+        });
         builder.setNegativeButton(R.string.dialog_keep_editing, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -376,28 +418,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Create and show the AlertDialog
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
-    }
-
-    @Override
-    public void onBackPressed() {
-        // If the book wasn't changed, continue with handling back button press
-        if (!mBookHasChanged) {
-            super.onBackPressed();
-            NavUtils.navigateUpFromSameTask(this);
-            return;
-        }
-
-        // If there are unsaved changes, setup a dialog to warn the user
-        DialogInterface.OnClickListener discardButtonClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // User clicked "Discard", close the current activity
-                finish();
-            }
-        };
-
-        // Show dialog that there are unsaved changes
-        showUnsavedChangesDialog(discardButtonClickListener);
     }
 
     private void showDeleteConfirmationDialog() {
@@ -494,5 +514,18 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // Close the activity
             finish();
         }
+    }
+
+    // Helper method to hide the keyboard
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        // Find the currently focused view, so we can grab the correct window token from it
+        View view = activity.getCurrentFocus();
+        // If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

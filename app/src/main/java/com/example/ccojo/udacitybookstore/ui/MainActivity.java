@@ -1,7 +1,8 @@
-package com.example.ccojo.udacitybookstore.activity;
+package com.example.ccojo.udacitybookstore.ui;
 
 import android.app.LoaderManager;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -10,14 +11,14 @@ import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import com.example.ccojo.udacitybookstore.BookCursorAdapter;
+import com.example.ccojo.udacitybookstore.adapters.BookCursorAdapter;
 import com.example.ccojo.udacitybookstore.R;
 import com.example.ccojo.udacitybookstore.data.BookContract.BookEntry;
 
@@ -107,16 +108,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_setup) {
-            //TODO: open preferences screen
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    // TODO:
-    // Used in the preferences screen
-    private void deleteData() {
-        int rowsDeleted = getContentResolver().delete(BookEntry.CONTENT_URI, null, null);
     }
 
     // Called when a new Loader needs to be created

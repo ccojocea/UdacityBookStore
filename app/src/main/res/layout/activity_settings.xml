@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_padding"
+    tools:context="com.example.ccojo.udacitybookstore.ui.SettingsActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Using the following button will erase the entire contents of the books database. This action cannot be undone!" />
+
+    <Button
+        android:id="@+id/button_erase_database"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_margin"
+        android:layout_gravity="center"
+        android:text="Erase book database" />
+
+    <!--
+    <fragment
+        android:name="com.example.ccojo.udacitybookstore.ui.SettingsActivity$BooksPreferenceFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </fragment>
+    -->
+
+</LinearLayout>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Default colors -->
-    <color name="colorPrimary">#8f9199</color>
+    <color name="colorPrimary">#3a3a3b</color>
     <color name="colorPrimaryDark">#2d2d31</color>
     <color name="colorAccent">#ff7340</color>
 
@@ -13,4 +13,5 @@
 
     <!-- Primary dark color for the editor -->
     <color name="editorColorPrimaryDark">#394450</color>
+    <color name="list_item_text_color">#AEB6BD</color>
 </resources>

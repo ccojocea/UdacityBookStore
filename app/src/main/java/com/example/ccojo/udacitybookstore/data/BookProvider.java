@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.ccojo.udacitybookstore.R;
+import com.example.ccojo.udacitybookstore.data.BookContract.BookEntry;
 
 public class BookProvider extends ContentProvider {
 
@@ -60,7 +61,7 @@ public class BookProvider extends ContentProvider {
         int match = sUriMatcher.match(uri);
         switch (match) {
             case BOOKS:
-                cursor = database.query(BookContract.BookEntry.TABLE_NAME,
+                cursor = database.query(BookEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -69,10 +70,10 @@ public class BookProvider extends ContentProvider {
                         sortOrder);
                 break;
             case BOOK_ID:
-                selection = BookContract.BookEntry._ID + "=?";
+                selection = BookEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
-                cursor = database.query(BookContract.BookEntry.TABLE_NAME,
+                cursor = database.query(BookEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -111,7 +112,7 @@ public class BookProvider extends ContentProvider {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Insert new Book with the given values
-        long id = database.insert(BookContract.BookEntry.TABLE_NAME, null, values);
+        long id = database.insert(BookEntry.TABLE_NAME, null, values);
         if (id == -1) {
             Log.e(LOG_TAG, "Failed to insert row for " + uri);
             return null;
@@ -134,7 +135,7 @@ public class BookProvider extends ContentProvider {
                 rowsUpdated = updateBook (uri, values, selection, selectionArgs);
                 break;
             case BOOK_ID:
-                selection = BookContract.BookEntry._ID + "=?";
+                selection = BookEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
                 rowsUpdated = updateBook (uri, values, selection, selectionArgs);
@@ -163,7 +164,7 @@ public class BookProvider extends ContentProvider {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Perform the update on the database and get the number of rows affected
-        int rowsUpdated = database.update(BookContract.BookEntry.TABLE_NAME, values, selection, selectionArgs);
+        int rowsUpdated = database.update(BookEntry.TABLE_NAME, values, selection, selectionArgs);
 
         // If 1 or more rows were updated, notify all listeners that the data at the given URI has changed
         if (rowsUpdated != 0) {
@@ -187,13 +188,13 @@ public class BookProvider extends ContentProvider {
         switch (match) {
             case BOOKS:
                 // Delete all the rows that match the selection and the selection args
-                rowsDeleted = database.delete(BookContract.BookEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(BookEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case BOOK_ID:
                 // Delete a single row given by the ID in the URI
-                selection = BookContract.BookEntry._ID + "=?";
+                selection = BookEntry._ID + "=?";
                 selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
-                rowsDeleted = database.delete(BookContract.BookEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(BookEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Deletion is not supported for " + uri);
@@ -217,9 +218,9 @@ public class BookProvider extends ContentProvider {
 
         switch (match) {
             case BOOKS:
-                return BookContract.BookEntry.CONTENT_LIST_TYPE;
+                return BookEntry.CONTENT_LIST_TYPE;
             case BOOK_ID:
-                return BookContract.BookEntry.CONTENT_ITEM_TYPE;
+                return BookEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalStateException("Unknown URI " + uri + " with match " + match);
         }
@@ -227,40 +228,52 @@ public class BookProvider extends ContentProvider {
 
     private static void validateData (ContentValues values) {
 
-        // Check that the name is not null
-        String name = values.getAsString(BookContract.BookEntry.COLUMN_PRODUCT_NAME);
-        if (name == null || name.equals("")) {
-            throw new IllegalArgumentException("Book requires a name");
+        if (values.containsKey(BookEntry.COLUMN_PRODUCT_NAME)) {
+            // Check that the name is not null
+            String name = values.getAsString(BookEntry.COLUMN_PRODUCT_NAME);
+            if (name == null || name.equals("")) {
+                throw new IllegalArgumentException("Book requires a name");
+            }
         }
 
-        // Check that the format is valid
-        Integer format = values.getAsInteger(BookContract.BookEntry.COLUMN_FORMAT);
-        if (format == null || !BookContract.BookEntry.isValidFormat(format)) {
-            throw new IllegalArgumentException("Invalid book format");
+        if (values.containsKey(BookEntry.COLUMN_FORMAT)) {
+            // Check that the format is valid
+            Integer format = values.getAsInteger(BookEntry.COLUMN_FORMAT);
+            if (format == null || !BookEntry.isValidFormat(format)) {
+                throw new IllegalArgumentException("Invalid book format");
+            }
         }
 
-        // Check that the print type is valid
-        Integer print = values.getAsInteger(BookContract.BookEntry.COLUMN_PRINT_TYPE);
-        if (print == null || !BookContract.BookEntry.isValidPrint(print)) {
-            throw new IllegalArgumentException("Invalid book print type");
+        if (values.containsKey(BookEntry.COLUMN_PRINT_TYPE)) {
+            // Check that the print type is valid
+            Integer print = values.getAsInteger(BookEntry.COLUMN_PRINT_TYPE);
+            if (print == null || !BookEntry.isValidPrint(print)) {
+                throw new IllegalArgumentException("Invalid book print type");
+            }
         }
 
-        // Check that the genre is valid
-        Integer genre = values.getAsInteger(BookContract.BookEntry.COLUMN_GENRE);
-        if (genre == null || !BookContract.BookEntry.isValidGenre(genre)) {
-            throw new IllegalArgumentException("Invalid book genre");
+        if (values.containsKey(BookEntry.COLUMN_GENRE)) {
+            // Check that the genre is valid
+            Integer genre = values.getAsInteger(BookEntry.COLUMN_GENRE);
+            if (genre == null || !BookEntry.isValidGenre(genre)) {
+                throw new IllegalArgumentException("Invalid book genre");
+            }
         }
 
-        // Check that the price is provided, and check that it's greater than or equal to 0
-        Integer price = values.getAsInteger(BookContract.BookEntry.COLUMN_PRICE);
-        if (price == null || price < 0) {
-            throw new IllegalArgumentException("Book requires a price which must be a positive value");
+        if (values.containsKey(BookEntry.COLUMN_PRICE)) {
+            // Check that the price is provided, and check that it's greater than or equal to 0
+            Integer price = values.getAsInteger(BookEntry.COLUMN_PRICE);
+            if (price == null || price < 0) {
+                throw new IllegalArgumentException("Book requires a price which must be a positive value");
+            }
         }
 
-        // Check that if the quantity is provided, it's greater than or equal to 0
-        Integer quantity = values.getAsInteger(BookContract.BookEntry.COLUMN_QUANTITY);
-        if (quantity != null && price < 0) {
-            throw new IllegalArgumentException("The item quantity must be a positive value");
+        if (values.containsKey(BookEntry.COLUMN_QUANTITY)) {
+            // Check that if the quantity is provided, it's greater than or equal to 0
+            Integer quantity = values.getAsInteger(BookEntry.COLUMN_QUANTITY);
+            if (quantity != null && quantity < 0) {
+                throw new IllegalArgumentException("The item quantity must be a positive value");
+            }
         }
 
         // No need to check the author, any value is valid (including null).

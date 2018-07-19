@@ -9,25 +9,38 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.MainActivity">
+        <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.EditorActivity"
-            android:theme="@style/EditorTheme"
-            android:parentActivityName=".activity.MainActivity" >
+        <activity
+            android:name=".ui.EditorActivity"
+            android:parentActivityName=".ui.MainActivity"
+            android:theme="@style/EditorTheme">
+
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity" />
+                android:value=".ui.MainActivity" />
         </activity>
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:parentActivityName=".ui.MainActivity" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.MainActivity" />
+        </activity>
+
         <provider
-            android:authorities="com.example.ccojo.udacitybookstore"
             android:name=".data.BookProvider"
-            android:exported="false"/>
+            android:authorities="com.example.ccojo.udacitybookstore"
+            android:exported="false" />
+
     </application>
 
 </manifest>
