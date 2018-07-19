@@ -185,7 +185,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mOrderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mSupplierPhoneEditText.getText() != null && !mSupplierPhoneEditText.getText().equals("")) {
+                if (mSupplierPhoneEditText.getText() != null && !mSupplierPhoneEditText.getText().toString().equals("")) {
                     Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(getString(R.string.tel_uri_string) + mSupplierPhoneEditText.getText().toString()));
 
                     if (checkForPhonePermission()) {
