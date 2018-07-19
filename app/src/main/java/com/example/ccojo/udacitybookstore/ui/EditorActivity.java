@@ -186,7 +186,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             @Override
             public void onClick(View v) {
                 if (mSupplierPhoneEditText.getText() != null && !mSupplierPhoneEditText.getText().equals("")) {
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mSupplierPhoneEditText.getText().toString()));
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(getString(R.string.tel_uri_string) + mSupplierPhoneEditText.getText().toString()));
 
                     if (checkForPhonePermission()) {
                         startActivity(intent);
@@ -583,7 +583,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             if (currentQuantity > 0) {
                 currentQuantity--;
             } else {
-                Toast.makeText(this, "Can't decrease quantity under 0", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.decrease_quantity_error, Toast.LENGTH_SHORT).show();
             }
             mQuantityEditText.setText(String.valueOf(currentQuantity));
         } else {
@@ -617,7 +617,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-            Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mSupplierPhoneEditText.getText().toString()));
+            Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(getString(R.string.tel_uri_string) + mSupplierPhoneEditText.getText().toString()));
             startActivity(intent);
         }
     }

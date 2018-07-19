@@ -76,4 +76,7 @@
     <string name="settings_erase_button">Erase book database</string>
     <string name="main_xml_setup">Setup</string>
     <string name="call_permission_wait">Waiting for call permission to be granted</string>
+    <string name="editor_order_book_button">Order book</string>
+    <string name="decrease_quantity_error">Can\'t decrease quantity under 0</string>
+    <string name="tel_uri_string">tel:</string>
 </resources>
