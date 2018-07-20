@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Application name -->
     <string name="app_name">Udacity Book Store</string>
     <string name="button_sale_list_item">Sale</string>
@@ -62,7 +62,6 @@
     <string name="cursor_adapter_negative_quantity_warning">Cannot sell that which you do not have!</string>
     <string name="quantity_label">Quantity:</string>
     <string name="price_label">Price: $</string>
-
     <string name="settings_default_theme_default">@string/settings_default_theme_value_light</string>
     <string name="settings_default_theme_value_dark">dark</string>
     <string name="settings_default_theme_value_light">light</string>
@@ -79,4 +78,19 @@
     <string name="editor_order_book_button">Order book</string>
     <string name="decrease_quantity_error">Can\'t decrease quantity under 0</string>
     <string name="tel_uri_string">tel:</string>
+    <string name="book_name_missing">Book requires a name</string>
+    <string name="book_format_invalid">Invalid book format</string>
+    <string name="invalid_book_print">Invalid book print type</string>
+    <string name="invalid_book_genre">Invalid book genre</string>
+    <string name="book_price_positive">Book requires a price which must be a positive value</string>
+    <string name="book_quantity_positive">The item quantity must be a positive value</string>
+    <string name="minus">-</string>
+    <string name="plus">+</string>
+
+    <string name="insertion_not_supported">Insertion is not supported for&#032;</string>
+    <string name="failed_to_insert_row">Failed to insert row for&#032;</string>
+    <string name="update_not_supported">Update is not supported for&#032;</string>
+    <string name="deletion_not_supported">Deletion is not supported for&#032;</string>
+
+
 </resources>

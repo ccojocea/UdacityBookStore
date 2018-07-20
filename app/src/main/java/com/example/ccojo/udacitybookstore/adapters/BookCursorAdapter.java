@@ -6,7 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +18,11 @@ import com.example.ccojo.udacitybookstore.R;
 import com.example.ccojo.udacitybookstore.data.BookContract.BookEntry;
 import com.example.ccojo.udacitybookstore.ui.MainActivity;
 
-public class BookCursorAdapter extends CursorAdapter{
+public class BookCursorAdapter extends CursorAdapter {
 
     private static final String TAG = BookCursorAdapter.class.getSimpleName();
 
-    public BookCursorAdapter (Context context, Cursor cursor) {
+    public BookCursorAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
     }
 
@@ -85,7 +84,7 @@ public class BookCursorAdapter extends CursorAdapter{
         });
 
         // Set dark or light "theme"
-        if (MainActivity.THEME.equals(context.getString(R.string.settings_default_theme_value_dark))) {
+        if (MainActivity.sTheme.equals(context.getString(R.string.settings_default_theme_value_dark))) {
             tvBookName.setTextColor(context.getResources().getColor(R.color.colorWhite));
         } else {
             tvBookName.setTextColor(context.getResources().getColor(R.color.list_item_name_color));

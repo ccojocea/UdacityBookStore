@@ -27,31 +27,26 @@ import com.example.ccojo.udacitybookstore.data.BookContract.BookEntry;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // Tag for log messages
-    private static final String LOG_TAG = MainActivity.class.getName();
-
+    private static final String TAG = MainActivity.class.getName();
+    // Constant for the cursor loader
+    private static final int BOOK_LOADER = 0;
+    // Book rows to be retrieved
+    private static final String[] PROJECTION = {
+            BookEntry._ID,
+            BookEntry.COLUMN_PRODUCT_NAME,
+            BookEntry.COLUMN_AUTHOR,
+            BookEntry.COLUMN_PRICE,
+            BookEntry.COLUMN_QUANTITY
+    };
     // Theme
-    public static String THEME;
-
+    public static String sTheme;
     // Views
     private ListView bookListView;
     private View emptyView;
     private View baseView;
     private TextView emptyTitleTV;
-
     // Adapter used to display the list's data
     private BookCursorAdapter mCursorAdapter;
-
-    // Constant for the cursor loader
-    private static final int BOOK_LOADER = 0;
-
-    // Book rows to be retrieved
-    private static final String[] PROJECTION = {
-        BookEntry._ID,
-        BookEntry.COLUMN_PRODUCT_NAME,
-        BookEntry.COLUMN_AUTHOR,
-        BookEntry.COLUMN_PRICE,
-        BookEntry.COLUMN_QUANTITY
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // Get preferences
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        THEME = sharedPreferences.getString(getString(R.string.settings_default_theme_key), getString(R.string.settings_default_theme_value_light));
+        sTheme = sharedPreferences.getString(getString(R.string.settings_default_theme_key), getString(R.string.settings_default_theme_value_light));
 
         // Initialise views
         bookListView = findViewById(R.id.list_view);
@@ -69,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         emptyTitleTV = findViewById(R.id.empty_title_text);
 
         // Set dark or light "theme"
-        if (THEME.equals(getString(R.string.settings_default_theme_value_dark))) {
+        if (sTheme.equals(getString(R.string.settings_default_theme_value_dark))) {
             bookListView.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             baseView.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             emptyTitleTV.setTextColor(getResources().getColor(R.color.colorWhite));

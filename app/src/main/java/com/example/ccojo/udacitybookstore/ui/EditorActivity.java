@@ -13,18 +13,17 @@ import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -47,39 +46,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     // Constant for the cursor loader
     private static final int BOOK_LOADER = 0;
-
-    // Uri
-    private Uri mBookUri;
-
-    // Boolean used after user tries to save an item
-    private boolean hasPressedSave = false;
-
-    // OnTouchListener - if the user touches a view, implying that they modified the view, change the
-    // boolean to true
-    private boolean mBookHasChanged = false;
-    private final View.OnTouchListener mTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            mBookHasChanged = true;
-            // Return false (Android will pass the event down to other views, which could be under this view)
-            // Return true = The press is taken care of, tell Android to forget it.
-            return false;
-        }
-    };
-
-    // OnTouchListener for spinners, to close the Text Input
-    private final View.OnTouchListener mTouchListenerSpinners = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            mBookHasChanged = true;
-
-            // Hide the keyboard if a spinner is touched
-            hideKeyboard(EditorActivity.this);
-
-            return false;
-        }
-    };
-
     // Book rows to be retrieved
     private static final String[] PROJECTION = {
             BookEntry._ID,
@@ -94,7 +60,34 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             BookEntry.COLUMN_SUPPLIER_PHONE_NUMBER,
             BookEntry.COLUMN_LANGUAGE
     };
+    // Uri
+    private Uri mBookUri;
+    // Boolean used after user tries to save an item
+    private boolean mHasPressedSave = false;
+    // OnTouchListener - if the user touches a view, implying that they modified the view, change the
+    // boolean to true
+    private boolean mBookHasChanged = false;
+    private final View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            mBookHasChanged = true;
+            // Return false (Android will pass the event down to other views, which could be under this view)
+            // Return true = The press is taken care of, tell Android to forget it.
+            return false;
+        }
+    };
+    // OnTouchListener for spinners, to close the Text Input
+    private final View.OnTouchListener mTouchListenerSpinners = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            mBookHasChanged = true;
 
+            // Hide the keyboard if a spinner is touched
+            hideKeyboard(EditorActivity.this);
+
+            return false;
+        }
+    };
     // Views
     private EditText mNameEditText;
     private EditText mAuthorEditText;
@@ -115,11 +108,27 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private int mPrint = 0;
     private int mFormat = 0;
 
+    // Helper method to hide the keyboard
+    private static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        // Find the currently focused view, so we can grab the correct window token from it
+        View view = activity.getCurrentFocus();
+        // If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+
+        // Hide the Keyboard when focus on EditText
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         // Find all the relevant views that we need to read user input from
         mNameEditText = findViewById(R.id.edit_book_name);
@@ -242,7 +251,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                         mGenre = BookEntry.GENRE_LITERARY_FICTION;
                     } else if (selection.equals(getString(R.string.genre_historical_fiction))) {
                         mGenre = BookEntry.GENRE_HISTORICAL_FICTION;
-                    } else if (selection.equals(getString(R.string.genre_science_fiction))){
+                    } else if (selection.equals(getString(R.string.genre_science_fiction))) {
                         mGenre = BookEntry.GENRE_SCIENCE_FICTION;
                     } else {
                         mGenre = BookEntry.GENRE_HISTORY;
@@ -315,14 +324,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 //Save book to the database
                 try {
                     // disable the save button so the user doesn't press it multiple times
-                    hasPressedSave = true;
+                    mHasPressedSave = true;
                     invalidateOptionsMenu();
 
                     // try to save the book
                     saveBook();
                 } catch (IllegalArgumentException e) {
                     // If an error is caught, make sure the button is enabled again
-                    hasPressedSave = false;
+                    mHasPressedSave = false;
                     invalidateOptionsMenu();
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     return false;
@@ -366,7 +375,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
 
         // If user pressed save, disable the save button
-        if (hasPressedSave) {
+        if (mHasPressedSave) {
             MenuItem menuItem = menu.findItem(R.id.action_save);
             menuItem.setEnabled(false);
         }
@@ -442,7 +451,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         showUnsavedChangesDialog();
     }
 
-    private void showUnsavedChangesDialog () {
+    private void showUnsavedChangesDialog() {
         // Create an AlertDialog.Builder and set the message and click listeners for positive/negative buttons
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.unsaved_changes_dialog_message);
@@ -564,19 +573,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
-    // Helper method to hide the keyboard
-    private static void hideKeyboard(Activity activity) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        // Find the currently focused view, so we can grab the correct window token from it
-        View view = activity.getCurrentFocus();
-        // If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = new View(activity);
-        }
-
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
     private void decreaseQuantity() {
         if (mQuantityEditText.getText() != null && !mQuantityEditText.getText().toString().equals("")) {
             int currentQuantity = Integer.valueOf(mQuantityEditText.getText().toString());
@@ -604,7 +600,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     // check for call permissions
     private boolean checkForPhonePermission() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CALL_PHONE}, MY_PERMISSIONS_REQUEST_CALL_PHONE);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, MY_PERMISSIONS_REQUEST_CALL_PHONE);
             return false;
         } else {
             return true;

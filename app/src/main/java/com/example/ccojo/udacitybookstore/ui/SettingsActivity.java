@@ -21,22 +21,22 @@ import com.example.ccojo.udacitybookstore.data.BookContract;
 public class SettingsActivity extends AppCompatActivity {
 
     // Tag for log messages
-    private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
+    private static final String TAG = SettingsActivity.class.getSimpleName();
 
     // Views
-    private Button deleteButton;
+    private Button mDeleteButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        deleteButton = findViewById(R.id.button_erase_database);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
+        mDeleteButton = findViewById(R.id.button_erase_database);
+        mDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Disable the button
-                deleteButton.setEnabled(false);
+                mDeleteButton.setEnabled(false);
 
                 // Show confirmation dialog
                 showDeleteConfirmationDialog();
@@ -71,7 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Enable the button
-                deleteButton.setEnabled(true);
+                mDeleteButton.setEnabled(true);
 
                 // User clicked the "cancel" button so dismiss the dialog
                 if (dialog != null) {
