@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,36 +27,65 @@ public class BookCursorAdapter extends CursorAdapter {
         super(context, cursor, 0);
     }
 
+    // View lookup cache
+    private static class ViewHolder {
+        TextView tvBookName;
+        TextView tvBookAuthor;
+        TextView tvBookQuantity;
+        TextView tvBookPrice;
+        Button saleButton;
+
+        /*
+        String name;
+        String author;
+        int quantity;
+        int price;
+        int id;
+        */
+    }
+
     // The newView method is used to inflate a new view and return it
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.book_list_item, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.book_list_item, parent, false);
+
+        // Get a new ViewHolder instance
+        ViewHolder holder = new ViewHolder();
+
+        // Find views to populate in inflated template
+        holder.tvBookName = view.findViewById(R.id.tv_book_name);
+        holder.tvBookAuthor = view.findViewById(R.id.tv_book_author);
+        holder.tvBookQuantity = view.findViewById(R.id.tv_book_quantity);
+        holder.tvBookPrice = view.findViewById(R.id.tv_book_price);
+        holder.saleButton = view.findViewById(R.id.button_sale);
+
+        // Set the holder tag to the view
+        view.setTag(holder);
+
+        return view;
     }
 
     // The bindView method is used to bind all data to a given view
     @Override
-    public void bindView(View view, final Context context, final Cursor cursor) {
-        // Find views to populate in inflated template
-        TextView tvBookName = view.findViewById(R.id.tv_book_name);
-        TextView tvBookAuthor = view.findViewById(R.id.tv_book_author);
-        TextView tvBookQuantity = view.findViewById(R.id.tv_book_quantity);
-        TextView tvBookPrice = view.findViewById(R.id.tv_book_price);
+    public void bindView(View view, final Context context, Cursor cursor) {
+
+        // Get tag for ViewHolder
+        ViewHolder holder = (ViewHolder) view.getTag();
 
         // Extract properties from the cursor
         String name = cursor.getString(cursor.getColumnIndexOrThrow(BookEntry.COLUMN_PRODUCT_NAME));
         String author = cursor.getString(cursor.getColumnIndexOrThrow(BookEntry.COLUMN_AUTHOR));
         final int quantity = cursor.getInt(cursor.getColumnIndexOrThrow(BookEntry.COLUMN_QUANTITY));
         int price = cursor.getInt(cursor.getColumnIndexOrThrow(BookEntry.COLUMN_PRICE));
-
         final int id = cursor.getInt(cursor.getColumnIndexOrThrow(BookEntry._ID));
 
+        // Display unknown author instead of ""
         if (TextUtils.isEmpty(author)) {
             author = context.getString(R.string.unknown_author);
         }
 
         // Add listener on button to decrease quantity
-        Button saleButton = view.findViewById(R.id.button_sale);
-        saleButton.setOnClickListener(new View.OnClickListener() {
+        holder.saleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Create uri for current book
@@ -85,15 +115,15 @@ public class BookCursorAdapter extends CursorAdapter {
 
         // Set dark or light "theme"
         if (MainActivity.sTheme.equals(context.getString(R.string.settings_default_theme_value_dark))) {
-            tvBookName.setTextColor(context.getResources().getColor(R.color.colorWhite));
+            holder.tvBookName.setTextColor(context.getResources().getColor(R.color.colorWhite));
         } else {
-            tvBookName.setTextColor(context.getResources().getColor(R.color.list_item_name_color));
+            holder.tvBookName.setTextColor(context.getResources().getColor(R.color.list_item_name_color));
         }
 
         // Populate fields with extracted properties
-        tvBookName.setText(name);
-        tvBookAuthor.setText(author);
-        tvBookPrice.setText(String.valueOf(price));
-        tvBookQuantity.setText(String.valueOf(quantity));
+        holder.tvBookName.setText(name);
+        holder.tvBookAuthor.setText(author);
+        holder.tvBookPrice.setText(String.valueOf(price));
+        holder.tvBookQuantity.setText(String.valueOf(quantity));
     }
 }
