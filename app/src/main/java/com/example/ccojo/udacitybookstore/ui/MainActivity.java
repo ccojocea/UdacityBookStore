@@ -23,6 +23,9 @@ import com.example.ccojo.udacitybookstore.adapters.BookCursorAdapter;
 import com.example.ccojo.udacitybookstore.R;
 import com.example.ccojo.udacitybookstore.data.BookContract.BookEntry;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 @SuppressWarnings("FieldCanBeLocal")
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -41,10 +44,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     // Theme
     public static String sTheme;
     // Views
-    private ListView bookListView;
-    private View emptyView;
-    private View baseView;
-    private TextView emptyTitleTV;
+    @BindView(R.id.list_view)  ListView bookListView;
+    @BindView(R.id.empty_view)  View emptyView;
+    @BindView(R.id.base_main)  View baseView;
+    @BindView(R.id.empty_title_text)  TextView emptyTitleTV;
     // Adapter used to display the list's data
     private BookCursorAdapter mCursorAdapter;
 
@@ -57,11 +60,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sTheme = sharedPreferences.getString(getString(R.string.settings_default_theme_key), getString(R.string.settings_default_theme_value_light));
 
-        // Initialise views
-        bookListView = findViewById(R.id.list_view);
-        emptyView = findViewById(R.id.empty_view);
-        baseView = findViewById(R.id.base_main);
-        emptyTitleTV = findViewById(R.id.empty_title_text);
+        // Initialise views with ButterKnife instead of findViewById calls
+        ButterKnife.bind(this);
 
         // Set dark or light "theme"
         if (sTheme.equals(getString(R.string.settings_default_theme_value_dark))) {

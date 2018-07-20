@@ -4,7 +4,6 @@ import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -20,7 +19,7 @@ public class BookProvider extends ContentProvider {
     /**
      * Constant for LOG messages
      */
-    private static final String LOG_TAG = BookProvider.class.getSimpleName();
+    private static final String TAG = BookProvider.class.getSimpleName();
     /**
      * URI matcher code for the content URI for the books table
      */
@@ -48,13 +47,13 @@ public class BookProvider extends ContentProvider {
      */
     private BookDbHelper mDbHelper;
 
-    private static void validateData(ContentValues values) {
+    private void validateData(ContentValues values) {
 
         if (values.containsKey(BookEntry.COLUMN_PRODUCT_NAME)) {
             // Check that the name is not null
             String name = values.getAsString(BookEntry.COLUMN_PRODUCT_NAME);
             if (name == null || name.equals("")) {
-                throw new IllegalArgumentException(Resources.getSystem().getString(R.string.book_name_missing));
+                throw new IllegalArgumentException(getContext().getString(R.string.book_name_missing));
             }
         }
 
@@ -62,7 +61,7 @@ public class BookProvider extends ContentProvider {
             // Check that the format is valid
             Integer format = values.getAsInteger(BookEntry.COLUMN_FORMAT);
             if (format == null || !BookEntry.isValidFormat(format)) {
-                throw new IllegalArgumentException(Resources.getSystem().getString(R.string.book_format_invalid));
+                throw new IllegalArgumentException(getContext().getString(R.string.book_format_invalid));
             }
         }
 
@@ -70,7 +69,7 @@ public class BookProvider extends ContentProvider {
             // Check that the print type is valid
             Integer print = values.getAsInteger(BookEntry.COLUMN_PRINT_TYPE);
             if (print == null || !BookEntry.isValidPrint(print)) {
-                throw new IllegalArgumentException(Resources.getSystem().getString(R.string.invalid_book_print));
+                throw new IllegalArgumentException(getContext().getString(R.string.invalid_book_print));
             }
         }
 
@@ -78,7 +77,7 @@ public class BookProvider extends ContentProvider {
             // Check that the genre is valid
             Integer genre = values.getAsInteger(BookEntry.COLUMN_GENRE);
             if (genre == null || !BookEntry.isValidGenre(genre)) {
-                throw new IllegalArgumentException(Resources.getSystem().getString(R.string.invalid_book_genre));
+                throw new IllegalArgumentException(getContext().getString(R.string.invalid_book_genre));
             }
         }
 
@@ -86,7 +85,7 @@ public class BookProvider extends ContentProvider {
             // Check that the price is provided, and check that it's greater than or equal to 0
             Integer price = values.getAsInteger(BookEntry.COLUMN_PRICE);
             if (price == null || price < 0) {
-                throw new IllegalArgumentException(Resources.getSystem().getString(R.string.book_price_positive));
+                throw new IllegalArgumentException(getContext().getString(R.string.book_price_positive));
             }
         }
 
@@ -94,7 +93,7 @@ public class BookProvider extends ContentProvider {
             // Check that if the quantity is provided, it's greater than or equal to 0
             Integer quantity = values.getAsInteger(BookEntry.COLUMN_QUANTITY);
             if (quantity != null && quantity < 0) {
-                throw new IllegalArgumentException(Resources.getSystem().getString(R.string.book_quantity_positive));
+                throw new IllegalArgumentException(getContext().getString(R.string.book_quantity_positive));
             }
         }
 
@@ -174,7 +173,6 @@ public class BookProvider extends ContentProvider {
     }
 
     private Uri insertBook(Uri uri, ContentValues values) {
-
         // Validate values provided. Will throw an exception if error is found
         validateData(values);
 
@@ -184,7 +182,7 @@ public class BookProvider extends ContentProvider {
         // Insert new Book with the given values
         long id = database.insert(BookEntry.TABLE_NAME, null, values);
         if (id == -1) {
-            Log.e(LOG_TAG, getContext().getString(R.string.failed_to_insert_row) + uri);
+            Log.e(TAG, getContext().getString(R.string.failed_to_insert_row) + uri);
             return null;
         }
 

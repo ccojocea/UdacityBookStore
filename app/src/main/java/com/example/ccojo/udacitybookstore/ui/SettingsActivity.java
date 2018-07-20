@@ -18,6 +18,8 @@ import android.widget.Toast;
 import com.example.ccojo.udacitybookstore.R;
 import com.example.ccojo.udacitybookstore.data.BookContract;
 
+import butterknife.BindView;
+
 public class SettingsActivity extends AppCompatActivity {
 
     // Tag for log messages

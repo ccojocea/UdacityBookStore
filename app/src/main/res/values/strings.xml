@@ -91,6 +91,7 @@
     <string name="failed_to_insert_row">Failed to insert row for&#032;</string>
     <string name="update_not_supported">Update is not supported for&#032;</string>
     <string name="deletion_not_supported">Deletion is not supported for&#032;</string>
+    <string name="supplier_phone_number_missing">First enter the supplier\'s phone number!</string>
 
 
 </resources>

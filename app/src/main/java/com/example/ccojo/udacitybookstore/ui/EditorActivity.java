@@ -34,6 +34,9 @@ import android.widget.Toast;
 
 import com.example.ccojo.udacitybookstore.R;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 import static com.example.ccojo.udacitybookstore.data.BookContract.*;
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -89,19 +92,19 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
     };
     // Views
-    private EditText mNameEditText;
-    private EditText mAuthorEditText;
-    private EditText mPriceEditText;
-    private EditText mQuantityEditText;
-    private EditText mSupplierNameEditText;
-    private EditText mSupplierPhoneEditText;
-    private EditText mLanguageEditText;
-    private Spinner mPrintTypeSpinner;
-    private Spinner mFormatSpinner;
-    private Spinner mGenreSpinner;
-    private Button mPlus;
-    private Button mMinus;
-    private Button mOrderButton;
+    @BindView(R.id.edit_book_name)  EditText mNameEditText;
+    @BindView(R.id.edit_book_author)  EditText mAuthorEditText;
+    @BindView(R.id.edit_book_price)  EditText mPriceEditText;
+    @BindView(R.id.edit_book_quantity)  EditText mQuantityEditText;
+    @BindView(R.id.edit_supplier_name)  EditText mSupplierNameEditText;
+    @BindView(R.id.edit_supplier_phone)  EditText mSupplierPhoneEditText;
+    @BindView(R.id.edit_book_language)  EditText mLanguageEditText;
+    @BindView(R.id.spinner_print)  Spinner mPrintTypeSpinner;
+    @BindView(R.id.spinner_format)  Spinner mFormatSpinner;
+    @BindView(R.id.spinner_genre)  Spinner mGenreSpinner;
+    @BindView(R.id.plus_button)  Button mPlus;
+    @BindView(R.id.minus_button)  Button mMinus;
+    @BindView(R.id.order_book_button)  Button mOrderButton;
 
     // Genre, Print and Format
     private int mGenre = 0;
@@ -130,20 +133,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Hide the Keyboard when focus on EditText
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        // Find all the relevant views that we need to read user input from
-        mNameEditText = findViewById(R.id.edit_book_name);
-        mAuthorEditText = findViewById(R.id.edit_book_author);
-        mPriceEditText = findViewById(R.id.edit_book_price);
-        mQuantityEditText = findViewById(R.id.edit_book_quantity);
-        mSupplierNameEditText = findViewById(R.id.edit_supplier_name);
-        mSupplierPhoneEditText = findViewById(R.id.edit_supplier_phone);
-        mLanguageEditText = findViewById(R.id.edit_book_language);
-        mPrintTypeSpinner = findViewById(R.id.spinner_print);
-        mFormatSpinner = findViewById(R.id.spinner_format);
-        mGenreSpinner = findViewById(R.id.spinner_genre);
-        mPlus = findViewById(R.id.plus_button);
-        mMinus = findViewById(R.id.minus_button);
-        mOrderButton = findViewById(R.id.order_book_button);
+        // Use ButterKnife instead of findViewById calls
+        ButterKnife.bind(this);
 
         // Set the onTouchListener on all views
         mNameEditText.setOnTouchListener(mTouchListener);
@@ -202,6 +193,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     } else {
                         Toast.makeText(EditorActivity.this, R.string.call_permission_wait, Toast.LENGTH_SHORT).show();
                     }
+                } else {
+                    Toast.makeText(EditorActivity.this, R.string.supplier_phone_number_missing, Toast.LENGTH_SHORT).show();
                 }
             }
         });
